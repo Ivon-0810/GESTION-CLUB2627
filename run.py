@@ -21,21 +21,6 @@ if __name__ == "__main__":
         peupler_base()
         generer_effectifs()
         generer_entraineurs()
-        
-        # Tentative d'importation sécurisée pour le calendrier
-        try:
-            from app.services.calendrier_saison import generer_calendrier_saison_complete
-            # Importation dynamique de la saison
-            try:
-                from app.models.saison import Saison
-            except ImportError:
-                from app.models import Saison
-            
-            saison_courante = Saison.query.filter_by(est_courante=True).first()
-            if saison_courante:
-                generer_calendrier_saison_complete(saison_courante)
-        except Exception as e:
-            print(f"Note lors de l'initialisation du calendrier : {e}")
 
     # 2. Gestion du mode .exe (PyInstaller)
     est_fige = getattr(sys, "frozen", False)
