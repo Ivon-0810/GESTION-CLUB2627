@@ -7,8 +7,6 @@ from app.extensions import db
 from app.data.seed_data import peupler_base
 from app.data.generateur_joueurs import generer_effectifs
 from app.data.generateur_entraineurs import generer_entraineurs
-from app.services.calendrier_saison import generer_calendrier_saison_complete
-from app.models import Saison
 
 app = create_app()
 
@@ -24,9 +22,20 @@ if __name__ == "__main__":
         generer_effectifs()
         generer_entraineurs()
         
-        saison_courante = Saison.query.filter_by(est_courante=True).first()
-        if saison_courante:
-            generer_calendrier_saison_complete(saison_courante)
+        # Tentative d'importation sécurisée pour le calendrier
+        try:
+            from app.services.calendrier_saison import generer_calendrier_saison_complete
+            # Importation dynamique de la saison
+            try:
+                from app.models.saison import Saison
+            except ImportError:
+                from app.models import Saison
+            
+            saison_courante = Saison.query.filter_by(est_courante=True).first()
+            if saison_courante:
+                generer_calendrier_saison_complete(saison_courante)
+        except Exception as e:
+            print(f"Note lors de l'initialisation du calendrier : {e}")
 
     # 2. Gestion du mode .exe (PyInstaller)
     est_fige = getattr(sys, "frozen", False)
